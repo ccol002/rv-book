@@ -1,0 +1,39 @@
+VERIFICATIONCODE
+
+package rv;
+
+public class Verification {
+
+private static Boolean fitsHasBeenInitialised = false; 
+
+// Called to start verification 
+public static void setupVerification() { 
+  fitsHasBeenInitialised = false; 
+} 
+
+// Called from TransactionSystem.initialise 
+public static void fitsInitialisation() { 
+  fitsHasBeenInitialised = true; 
+} 
+
+// Check whether initialised 
+public static Boolean isInitialised() { 
+  return fitsHasBeenInitialised; 
+}
+}
+
+PRELUDE
+
+package rv;
+
+import assertion.Assertion;
+import fits.BackEnd;
+import fits.UserInfo;
+
+RULES
+
+// P2
+after BackEnd.initialise() | -> { Verification.fitsInitialisation(); } 
+before UserInfo.openSession() | !Verification.isInitialised() -> { Assertion.alert("P2 violated"); }
+
+

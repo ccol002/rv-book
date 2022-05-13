@@ -1,0 +1,123 @@
+VERIFICATIONCODE
+
+package rv;
+
+import java.util.HashMap;
+
+import fits.UserInfo;
+import fits.UserSession;
+
+public class Verification {
+
+	static public HashMap<UserInfo,Integer> countSessions;
+
+	static public void setupVerification() {
+	// required to reset the automata to their initial state
+	   Properties.setupVerification();
+	   
+		countSessions = new HashMap<UserInfo,Integer>();
+
+	}
+	
+}
+
+PRELUDE
+
+package rv;
+
+import assertion.Assertion;
+import fits.UserInfo;
+import fits.UserSession;
+import java.util.HashMap;
+
+
+
+AUTOMATA
+
+// P5
+property foreach target (UserInfo u) starting Enabled {
+  Enabled >>> before UserInfo.makeDisabled(..) target (UserInfo u)
+          >>> Disabled
+  Disabled >>> before UserInfo.makeEnabled(..) target (UserInfo u) 
+           >>> Enabled
+  Disabled >>> before UserInfo.withdrawFrom(..) target (UserInfo u) 
+           >>> Bad [P5 violated]
+
+}
+
+// P6
+property foreach target (UserInfo u) starting NonGreylisted keep (Integer count defaultTo 0) {
+
+   NonGreylisted >>> before UserInfo.makeGreylisted(..) target (UserInfo u) | -> { 
+	            count = 0;
+	         } 
+	     >>> Greylisted
+
+   Greylisted >>> after UserInfo.depositTo(..) target (UserInfo u) | -> { 
+	            
+	            count = count + 1; 
+             } 
+         >>> Greylisted
+         
+    Greylisted >>> before UserInfo.makeBlacklisted(..) target (UserInfo u) ->  {
+    			
+    			count = 0;  
+    		}
+         >>> NonGreylisted
+         
+    Greylisted >>> before UserInfo.makeWhitelisted(..) target (UserInfo u) 
+                 |  count >= 3 
+         >>> NonGreylisted
+            
+    Greylisted >>> before UserInfo.makeWhitelisted(..) target (UserInfo u) 
+                 |  count < 3 
+          >>> Bad[P6 violated]
+ }
+
+          
+// P9
+// A user may not have more than 3 active sessions at once.
+property foreach target (UserInfo u) starting Start {
+   Start >>> before UserInfo.openSession(..) target (UserInfo u) | -> {
+             Verification.countSessions.put(u,Verification.countSessions.getOrDefault(u,0)+1); 
+             if (Verification.countSessions.getOrDefault(u,0) > 3) { Assertion.alert("P9 violated"); }
+             }
+         >>> Start
+         
+   Start >>> before UserInfo.closeSession(..) target (UserInfo u) | -> {
+                Verification.countSessions.put(u,Verification.countSessions.get(u)-1); 
+             }
+         >>> Start
+}
+
+
+// P10
+// Logging can only be made to an active session (i.e. between a login and a logout)
+property foreach target (UserSession s) starting LoggedOut {
+    LoggedOut >>> before UserSession.openSession(..) target (UserSession s) 
+              >>> LoggedIn       
+                 
+    LoggedIn >>> before UserSession.closeSession(..) target (UserSession s) 
+             >>> LoggedOut
+          
+    LoggedOut >>> before UserSession.log(..) target (UserSession s)
+              >>> Bad[P10 violated] 
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

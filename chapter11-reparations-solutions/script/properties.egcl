@@ -1,0 +1,88 @@
+VERIFICATIONCODE
+
+package rv;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+
+import fits.*;
+import assertion.*;
+
+public class Verification {
+  static public void setupVerification()	{		
+		Properties.setupVerification();
+	}
+}
+
+PRELUDE
+
+package rv;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+
+import fits.*;
+import assertion.*;
+
+RULES
+
+// Property 1:
+// Only users based in Argentina can be gold users
+after UserInfo.makeGoldUser() target (UserInfo u)
+  throws RVExceptionProperty1
+  |  !u.getCountry().equals("Argentina")
+  -> {
+    // Log violation
+    Assertion.alert("P1 violated");
+    // Reparation throws exception handled in FrontEnd.ADMIN_makeGoldUser(..)
+    throw new RVExceptionProperty1("P1 violated");
+}
+
+
+// Property 3:
+// No account may end up with a negative balance after being accessed
+before BankAccount.withdraw(Double amount) target (BankAccount a)
+  throws RVExceptionProperty3
+  |  a.getBalance() - amount < 0
+  -> {
+    // Log violation
+    Assertion.alert("P3 violated");
+    // Reparation throws exception handled in UserInfo.withdrawFrom(..)
+    throw new RVExceptionProperty3("P3 violated");
+}
+
+// Property 6: 
+// Once greylisted, a user must perform at least three incoming transfers 
+// before being whitelisted.
+
+foreach target (UserInfo u)
+keep (Boolean greylisted defaultTo false, Integer countTransfers defaultTo 0)
+{
+    after UserInfo.makeGreylisted(..) target (UserInfo u) | -> {
+        greylisted = true;
+        countTransfers = 0;
+    }
+    
+    after UserInfo.depositTo(..) target (UserInfo u) | -> {
+        if (greylisted) {
+            countTransfers = countTransfers + 1;
+        }
+    }
+
+    after UserInfo.makeWhitelisted(..) target (UserInfo u)
+      throws RVExceptionProperty6
+      |  ( greylisted && countTransfers < 3 )
+      -> { 
+        // Log violation
+        Assertion.alert("P6 violated");
+
+        // Reparation throws exception handled in FrontEnd.ADMIN_whitelistUser(..)
+        throw new RVExceptionProperty6("P6 violated");
+      }          
+        
+    after UserInfo.makeWhitelisted(..) target (UserInfo u)
+      | -> { greylisted = false; }
+}
+

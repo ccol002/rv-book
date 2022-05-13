@@ -1,0 +1,118 @@
+VERIFICATIONCODE
+
+package rv;
+
+import java.util.HashMap;
+import java.util.HashSet;
+
+import assertion.Assertion;
+import fits.BackEnd;
+import fits.BankAccount;
+import fits.UserInfo;
+
+import timers.*;
+
+
+public class Verification {
+	
+	//Property 11
+	public static Long initialisedTime;
+	
+	//Property 14
+	public static Timer initialisationTimer; 
+	public static Boolean fitsReconciled = false; 
+	public static Boolean initialisationTimerSet = false; 
+	
+	//Property 15
+	public static HashSet<String> awaitingApproval;
+	
+	static public void setupVerification()
+	{
+		TimerManager.reset();
+		
+		//Property 11
+		initialisedTime = 0l;
+	
+		//Property 14
+		initialisationTimer = new Timer("initialisationTimer",5*60*1000l);
+		fitsReconciled = false; 
+		initialisationTimerSet = false;
+		
+		//Property 15
+		awaitingApproval = new HashSet<String>();
+		
+		Properties.setupVerification();
+	}
+	
+	
+}
+
+PRELUDE
+
+package rv;
+
+import java.util.HashMap;
+import java.util.ArrayList;
+import timers.*;
+import assertion.Assertion;
+import fits.BackEnd;
+import fits.BankAccount;
+import fits.FrontEnd;
+import fits.UserInfo;
+import fits.UserSession;
+
+RULES
+
+// Property 11 
+//A session should not be opened in the first ten seconds immediately after system initialisation
+BackEnd.initialise(..) | -> { Verification.initialisedTime = TimerManager.currentTimeMillis(); } 
+UserInfo.openSession(..) | TimerManager.currentTimeMillis() - Verification.initialisedTime < 10*1000 
+-> { Assertion.alert("P11 violated"); }
+   
+   
+//Property 14
+// Incomplete code to use for Exercise 10.5
+
+// Set up two timers: a 5 minute one for reconciliation and a 15 minute 
+// one for initialisation  
+//move the declarations below to the verification class 
+Timer reconciliationTimer = new Timer("ReconcilationTimer", 5*60*1000l); 
+Timer initialisationTimer = new Timer("InitialisationTimer", 15*60*1000l); 
+Boolean initialisationAllowed = true; 
+
+*.initialise(..) | initialisationAllowed -> { reconciliationTimer.reset(); 
+initialisationTimer.reset(); initialisationAllowed = false; } 
+*.initialise(..) | !initialisationAllowed -> { Assertion.alert( "Initialisation attempted before 15 minutes elapsed" ); } 
+
+//continue here 
+
+Timer.fire(..) target (Timer t) | t.getIdentifier().equals("InitialisationTimer") -> { initialisationAllowed = true; } 
+Timer.fire(..) target (Timer t) | t.getIdentifier().equals("ReconcilationTimer") -> { Assertion.alert("P14 violated"); }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

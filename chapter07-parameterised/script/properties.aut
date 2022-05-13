@@ -1,0 +1,75 @@
+VERIFICATIONCODE
+
+package rv;
+
+import java.util.HashMap;
+
+import fits.UserInfo;
+import fits.UserSession;
+
+public class Verification {
+
+	static public HashMap<UserInfo,Integer> countSessions;
+
+	static public void setupVerification() {
+	// required to reset the automata to their initial state
+	   Properties.setupVerification();
+	   
+	}
+	
+}
+
+PRELUDE
+
+package rv;
+
+import assertion.Assertion;
+import fits.UserInfo;
+import fits.UserSession;
+import java.util.HashMap;
+
+
+
+AUTOMATA
+
+
+// P6
+property foreach target (UserInfo u) starting NonGreylisted keep (Integer count defaultTo 0) {
+
+   NonGreylisted >>> before UserInfo.makeGreylisted(..) target (UserInfo u) | -> { 
+	            count = 0;
+	         } 
+	     >>> Greylisted
+
+   Greylisted >>> after UserInfo.depositTo(..) target (UserInfo u) | -> { 
+	            
+	            count = count + 1; 
+             } 
+         >>> Greylisted
+         
+    Greylisted >>> before UserInfo.makeBlacklisted(..) target (UserInfo u) ->  {
+    			
+    			count = 0;  
+    		}
+         >>> NonGreylisted
+         
+    Greylisted >>> before UserInfo.makeWhitelisted(..) target (UserInfo u) 
+                 |  count >= 3 
+         >>> NonGreylisted
+            
+    Greylisted >>> before UserInfo.makeWhitelisted(..) target (UserInfo u) 
+                 |  count < 3 
+          >>> Bad[P6 violated]
+ }
+
+
+
+
+
+
+
+
+
+
+
+

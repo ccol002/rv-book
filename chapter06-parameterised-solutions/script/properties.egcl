@@ -1,0 +1,159 @@
+VERIFICATIONCODE
+
+package rv;
+
+import java.util.HashMap;
+
+import assertion.Assertion;
+import fits.BackEnd;
+import fits.BankAccount;
+import fits.UserInfo;
+
+public class Verification {
+	static public boolean fitsHasBeenInitialised;
+	static public HashMap<UserInfo,HashMap<Integer, Integer>> accountRequestCount;
+	static public Integer fitsExternalMoneyTransferCount;
+	static public Double fitsExternalMoneyTransferAmount;
+	
+	static public void setupVerification()
+	{
+		fitsHasBeenInitialised = false;
+		accountRequestCount = new HashMap<UserInfo,HashMap<Integer, Integer>>();
+		fitsExternalMoneyTransferCount = 0;
+		fitsExternalMoneyTransferAmount = 0.0;
+		
+		Properties.setupVerification();
+	}
+	
+	// Property 4 verification
+	// A bank account approved by the administrator may not have the same account
+	// number as any other bank account already existing in the system
+
+	public static void fitsAdminApprovingAccount(String new_account_number, BackEnd fits) {
+		for (UserInfo user : fits.getUsers()) {
+			for (BankAccount account : user.getAccounts()) {
+				if (account.isOpen()) {
+					Assertion.check(!account.getAccountNumber().equals(new_account_number), "P4 violated");
+				}
+			}
+		}
+	}
+	
+}
+
+PRELUDE
+
+package rv;
+
+import java.util.HashMap;
+
+import assertion.Assertion;
+import fits.BackEnd;
+import fits.BankAccount;
+import fits.FrontEnd;
+import fits.UserInfo;
+import fits.UserSession;
+
+RULES
+
+// P1
+before *.makeGoldUser(..) target (UserInfo u) 
+  |  !(u.getCountry().equals("Argentina")) 
+  -> { Assertion.alert("P1 violated"); }
+
+// P2
+after BackEnd.initialise(..) | -> { Verification.fitsHasBeenInitialised = true; }
+before UserInfo.openSession(..) | !Verification.fitsHasBeenInitialised -> { Assertion.alert("P2 violated"); }
+
+// P3
+after BankAccount.withdraw(..) target (BankAccount a) | a.getBalance() < 0 -> { 
+  Assertion.alert("P3 violated"); }
+after BankAccount.deposit(..) target (BankAccount a) | a.getBalance() < 0 -> { 
+  Assertion.alert("P3 violated"); }
+
+// P4
+before FrontEnd.ADMIN_approveOpenAccount(Integer uid, String accnum) target (FrontEnd fe)
+  | -> { Verification.fitsAdminApprovingAccount(accnum,fe.getBackEnd()); }
+
+// P5
+//note that to use the foreach which binds only on the target, 
+//here we switch to the method UserInfo.makeEnabled and makeDisabled
+foreach (UserInfo u) keep (Boolean isEnabled defaultTo false) {
+  before UserInfo.makeDisabled(..) target (UserInfo u) | -> { isEnabled = false; }
+  before UserInfo.makeEnabled(..) target (UserInfo u) | -> { isEnabled = true; }
+  before UserInfo.withdrawFrom(..) target (UserInfo u) | !isEnabled 
+  -> { Assertion.alert("P5 violated"); }
+}
+
+// P6
+foreach (UserInfo u) keep (Boolean isGreylisted defaultTo false, Integer incomingTransfersSinceGreylisted defaultTo 0) 
+{
+after UserInfo.makeGreylisted(..) target (UserInfo u) | -> { 
+	isGreylisted = true;
+	incomingTransfersSinceGreylisted = 0;
+}
+//note that to use the foreach which binds only on the target, 
+//here we switch to the method UserInfo.depositTo
+before UserInfo.depositTo(..) target (UserInfo u) | -> { 
+	incomingTransfersSinceGreylisted = incomingTransfersSinceGreylisted + 1; 
+}
+before UserInfo.makeWhitelisted(..) target (UserInfo u) 
+  |  isGreylisted && incomingTransfersSinceGreylisted < 3
+  -> { Assertion.alert("P6 violated"); }
+  
+before UserInfo.makeBlacklisted(..) target (UserInfo u) | -> { 
+  incomingTransfersSinceGreylisted = 0;
+  isGreylisted = false; }
+  
+}
+
+
+// P7
+// No user may not request more than 10 new accounts in a single session.
+// Cannot be implemented using the Foreach notation
+
+
+// P8 
+// The administrator must reconcile accounts every 1000 attempted external money transfers or an 
+// aggregate total of one million dollars in attempted external transfers.
+before *.USER_payToExternal(Integer uid, Integer sid, String to_account_number, Double amount) | -> { 
+  Verification.fitsExternalMoneyTransferCount ++; 
+  Verification.fitsExternalMoneyTransferAmount += amount; 
+  if (Verification.fitsExternalMoneyTransferCount >= 1000 
+    || Verification.fitsExternalMoneyTransferAmount >= 1000000) {
+     Assertion.alert("P8 violated");
+  }
+}
+
+after *.ADMIN_reconcile(..) | -> { 
+  Verification.fitsExternalMoneyTransferCount = 0; 
+  Verification.fitsExternalMoneyTransferAmount = 0.0; }
+
+
+// P9
+// A user may not have more than 3 active sessions at once.
+foreach (UserInfo u) keep (Integer numberOfOpenSessions defaultTo 0) {
+  before UserInfo.openSession(..) target (UserInfo u) | -> {
+  	numberOfOpenSessions = numberOfOpenSessions + 1; 
+  if (numberOfOpenSessions > 3) { Assertion.alert("P9 violated"); }
+}
+before UserInfo.closeSession(..) target (UserInfo u) | -> {
+  numberOfOpenSessions = numberOfOpenSessions - 1; 
+}
+}
+
+
+// P10
+// Logging can only be made to an active session (i.e. between a login and a logout)
+foreach (UserSession s) keep (Boolean sessionIsOpen defaultTo false) {
+  before UserSession.openSession(..) target (UserSession s) | -> { sessionIsOpen = true; }
+  before UserSession.closeSession(..) target (UserSession s) | -> { sessionIsOpen = false; }
+  before UserSession.log(..) target (UserSession s)
+  |  !sessionIsOpen
+  -> { Assertion.alert("P10 violated"); }
+
+}
+
+
+
+

@@ -1,0 +1,73 @@
+VERIFICATIONCODE
+
+package transactionsystem;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+
+public class Verification {
+  static public Timer downgradeTimer;
+  static public FrontEnd frontend;
+}
+
+PRELUDE
+
+package transactionsystem;
+import java.util.HashMap;
+
+RULES
+
+foreach target (UserInfo u) 
+  keep (
+    Double depositsBalanceInMonth defaultTo 0, 
+    String currentCalendarMonth defaultTo ""
+  ) { 
+  
+  after UserInfo.depositTo(String account, Double amount) 
+  |  u.isNormalUser() 
+  -> {
+    // Update depositsBalance keeping track of current month
+    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM");
+    Date date = new Date(System.currentTimeMillis());
+    String new_currentCalendarMonth = formatter.format(date);
+
+    if (currentCalendarMonth.equals(new_currentCalendarMonth)) {
+      depositsBalance = depositsBalance + amount; 
+    } else {
+      currentCalendarMonth = new_currentCalendarMonth;
+      depositsBalance = amount;
+    } 
+    // See whether the user deserves an upgrade
+    if (depositsBalance >= 10000) { 
+      u.makeSilverUser();
+      Verification.downgradeTimer.reset(); 
+      Verification.downgradeTimer.enabled(); 
+    }
+  }
+  
+  before UserInfo.makeNormalUser() 
+  |  !u.isNormalUser() 
+  -> { 
+    Timer timer = new Timer( "DOWNGRADE TIMEOUT,"+u.getIdentifier().toString(), 30*24*60*60*1000l);
+    timer.disable();
+    Verification.downgradeTimer = timer;
+
+    depositsBalance = 0; 
+  }
+}
+
+before FrontEnd.ADMIN_initialise() target (FrontEnd frontend) | -> {
+  Verification.frontend = frontend;
+}
+
+before Timer.fire(..) target (Timer timer) | -> { 
+  String[] values = timer.getIdentifier.split(",");
+  if (values[0].equals("DOWNGRADE TIMER")) {
+        // Obtain uid from timer identifier
+        Integer uid = Integer.parseInt(values[1]);
+        // Make user normal again
+        Verification.frontend.ADMIN_makeNormalUser(uid);
+  }
+}
+

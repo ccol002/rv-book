@@ -1,0 +1,52 @@
+VERIFICATIONCODE
+
+
+package rv;
+
+import fits.FrontEnd;
+import timers.Timer;
+import timers.TimerManager;
+
+public class Verification {
+
+	public static Boolean initialised = false;
+	public static Timer reconcile_timer = null;
+	public static FrontEnd frontend = null;
+
+	static public void setupVerification() {
+		TimerManager.reset();
+		initialised = false;
+		reconcile_timer = null;
+		frontend = null;
+
+		Properties.setupVerification();
+	}
+}
+
+
+PRELUDE
+
+package rv;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+
+import fits.*;
+import assertion.*;
+import timers.*;
+
+RULES
+
+// Property 1:
+// Only users based in Argentina can be gold users
+after UserInfo.makeGoldUser() target (UserInfo u)
+  throws RVExceptionProperty1
+  |  !u.getCountry().equals("Argentina")
+  -> {
+    // Log violation
+    Assertion.alert("P1 violated");
+    // Reparation throws exception handled in FrontEnd.ADMIN_makeGoldUser(..)
+    throw new RVExceptionProperty1("P1 violated");
+}
+

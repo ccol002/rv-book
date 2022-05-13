@@ -1,0 +1,33 @@
+VERIFICATIONCODE
+
+package transactionsystem;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+
+public class Verification {
+}
+
+PRELUDE
+
+package transactionsystem;
+import java.util.HashMap;
+
+RULES
+
+after InternalTransaction.execute() target (InternalTransaction t)
+  throws RVExceptionPropertyCompoundTransaction
+  |  t.getSourceAccount().getBalance() > 10000
+  -> { 
+    // Log violation
+    Assertion.alert("Maximum account balance property violated");
+    // Throw exception
+    throw new RVExceptionPropertyCompoundTransaction("...");
+  }
+
+before CompoundTransaction.execute(..) target (ct) |
+  -> { 
+    ct.getOwner().saveBankAccountsSnapshot(); 
+  }
+       

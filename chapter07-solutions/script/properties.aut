@@ -1,0 +1,66 @@
+VERIFICATIONCODE
+
+package rv;
+
+public class Verification {
+
+	static public Integer fitsExternalMoneyTransferCount;
+	static public Double fitsExternalMoneyTransferAmount;
+
+	static public void setupVerification() {
+
+		fitsExternalMoneyTransferCount = 0;
+		fitsExternalMoneyTransferAmount = 0.0;
+
+// required to reset the automata to their initial state
+		Properties.setupVerification();
+	}
+
+}
+
+
+PRELUDE
+
+package rv;
+
+import fits.UserInfo;
+import fits.BackEnd;
+
+
+AUTOMATA
+
+// P2
+// The transaction system must be initialised before any user logs in.
+// + The initialisation can only happen before shutdown.
+property starting Start {
+  Start >>> after BackEnd.initialise(..) >>> Initialised
+  Initialised >>> before BackEnd.shutdown(..) >>> Shutdown
+  Start >>> before UserInfo.openSession(..) >>> Bad[P2 violated] 
+  Shutdown >>> before UserInfo.openSession(..) >>> Bad[P2 violated] 
+  }
+
+
+// P8 
+// The administrator must reconcile accounts every 1000 attempted external money transfers or an 
+// aggregate total of one million dollars in attempted external transfers.
+property starting Start {
+          
+    Start >>> before *.USER_payToExternal(Integer uid, Integer sid, String from_account_number, double amount) 
+              | (Verification.fitsExternalMoneyTransferCount+1>=1000
+               || Verification.fitsExternalMoneyTransferAmount+amount>=1000000)
+          >>> Bad[P8 violated]
+          
+    Start >>> before *.USER_payToExternal(Integer uid, Integer sid, String from_account_number, double amount) | -> {
+              Verification.fitsExternalMoneyTransferCount++; 
+              Verification.fitsExternalMoneyTransferAmount+=amount; }
+          >>> Start
+          
+    Start >>> after *.ADMIN_reconcile(..) | -> { 
+                 Verification.fitsExternalMoneyTransferCount = 0; 
+                 Verification.fitsExternalMoneyTransferAmount=0.0; }
+          >>> Start
+}
+
+
+
+

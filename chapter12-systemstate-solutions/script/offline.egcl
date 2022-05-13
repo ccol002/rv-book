@@ -1,0 +1,40 @@
+VERIFICATIONCODE
+
+package transactionsystem;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+
+public class Verification {
+}
+
+PRELUDE
+
+package fits;
+import java.util.HashMap;
+
+RULES
+
+*.replay() target (JoinPoint joinpoint) 
+  | joinpoint.matchFullName("UserInfo.makeGoldUser") &&
+    joinpoint.getJoinpointKind().equals(JoinpointKind.BEFORE)
+  -> { 
+    Assertion.check(
+      joinpoint.getParameter("country").equals("Argentina"),
+      "P1 violated"
+	);
+  }
+  
+*.replay() target (JoinPoint joinpoint) 
+  | joinpoint.matchFullName("UserInfo.setCountry") &&
+    joinpoint.getJoinpointKind().equals(JoinpointKind.BEFORE)
+  -> { 
+    Assertion.check(
+      joinpoint.getParameter("golduser").equals("true") &&
+      joinpoint.getArgumentValueFromName("country").equals("Argentina"),
+      "P1 violated"
+	);
+  }
+  
+  

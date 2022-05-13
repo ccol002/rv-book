@@ -1,0 +1,33 @@
+VERIFICATIONCODE
+
+package rv;
+
+public class Verification {
+
+
+	static public void setupVerification() {
+	}
+
+}
+
+
+PRELUDE
+
+package rv;
+
+import fits.UserInfo;
+import fits.BackEnd;
+
+
+AUTOMATA
+
+// P2
+// The transaction system must be initialised before any user logs in.
+property starting Start {
+  Start >>> after BackEnd.initialise(..) >>> Initialised
+  Start >>> before UserInfo.openSession(..) >>> Bad[P2 violated] 
+}
+
+
+
+

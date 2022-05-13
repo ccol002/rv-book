@@ -1,0 +1,37 @@
+VERIFICATIONCODE
+
+package transactionsystem;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+
+public class Verification {
+}
+
+PRELUDE
+
+package transactionsystem;
+import java.util.HashMap;
+
+RULES
+foreach target (UserInfo u) 
+  keep (Double depositsBalance defaultTo 0) {
+
+  after UserInfo.depositTo(String account, Double amount) 
+    |  u.isNormalUser()
+    -> {
+      depositsBalance = depositsBalance + amount;
+      if (depositsBalance >= 10000) {
+        u.makeSilverUser();
+
+        if (u.hasSpouse() && u.getSpouse().isNormalUser())
+          u.getSpouse().makeSilverUser();
+      }
+    }
+
+  before UserInfo.makeNormalUser() 
+    |  !u.isNormalUser()
+    -> { depositsBalance = 0; }
+
+}

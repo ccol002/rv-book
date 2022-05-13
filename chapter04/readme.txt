@@ -1,0 +1,1 @@
+To run the FiTS system, use fits.Main

@@ -1,0 +1,41 @@
+VERIFICATIONCODE
+
+package rv;
+
+public class Verification {
+
+// Called to start verification 
+public static void setupVerification() { 
+  
+} 
+
+}
+
+PRELUDE
+
+package rv;
+
+import assertion.Assertion;
+import fits.UserInfo;
+
+RULES
+
+// P6
+foreach target (UserInfo u) keep (Boolean greylisted defaultTo false, Integer countTransfers defaultTo 0) 
+{
+	UserInfo.makeGreylisted(..) target (UserInfo u) | -> { 
+		greylisted = true;
+		countTransfers = 0;
+	}
+	UserInfo.depositTo(..) target (UserInfo u) | -> { 
+		if (greylisted)
+			countTransfers = countTransfers + 1; 
+	}
+	UserInfo.makeWhitelisted(..) target (UserInfo u) 
+	  |  ( greylisted && countTransfers < 3 )
+	  -> { Assertion.alert("P6 violated"); }
+	  
+	UserInfo.makeWhitelisted(..) target (UserInfo u) 
+	  | -> { greylisted = false; }
+}
+

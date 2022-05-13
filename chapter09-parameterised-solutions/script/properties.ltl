@@ -1,0 +1,50 @@
+VERIFICATIONCODE
+
+
+//ignored for LTL
+
+PRELUDE
+
+package rv;
+
+import java.util.HashMap;
+
+import ltl.structure.*;
+import fits.*;
+import assertion.Assertion;
+
+LTL
+
+// P2
+// The transaction system must be initialised before any user logs in.
+
+property good behaviour {
+(not [before UserInfo.openSession]) Until [after BackEnd.initialise]
+}
+  
+  
+// P5
+// Once a user is disabled, he or she may not withdraw from an account until 
+// being made enable again.
+// no Withdrawal until Enabled and always ensure that
+// a Disable implies that from then on, no Withdrawal until Enabled 
+property foreach target (UserInfo u) good behaviour {
+((not [before UserInfo.withdrawFrom]) until [before UserInfo.makeEnabled]) and (globally ([before UserInfo.makeDisabled] implies next((not [before UserInfo.withdrawFrom]) until [before UserInfo.makeEnabled])))
+}
+  
+// P10
+// Logging can only be made to an active session (i.e. between openSession and closeSession).
+ //no log until openSession and always ensure that 
+ //a closeSession implies that from then on, no log until openSession
+  
+property foreach target (UserSession u) good behaviour{
+((not [before UserSession.log]) until [before UserSession.openSession]) and (globally ([before UserSession.closeSession] implies next((not [before UserSession.log]) until [before UserSession.openSession])))
+}
+
+  
+  
+  
+  
+  
+  
+

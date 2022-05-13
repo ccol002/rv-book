@@ -1,0 +1,101 @@
+VERIFICATIONCODE
+
+package rv;
+
+import assertion.Assertion;
+import fits.BackEnd;
+import fits.BankAccount;
+import fits.UserInfo;
+
+public class Verification {
+	static public boolean fitsHasBeenInitialised;
+	static public Integer fitsExternalMoneyTransferCount;
+	static public Double fitsExternalMoneyTransferAmount;
+	
+	static public void setupVerification()
+	{
+		fitsHasBeenInitialised = false;
+		fitsExternalMoneyTransferCount = 0;
+		fitsExternalMoneyTransferAmount = 0.0;
+	}
+	
+	// Property 2 verification
+	
+	// Called from TransactionSystem.initialise 
+	public static void fitsInitialisation() { 
+	  fitsHasBeenInitialised = true; 
+	} 
+	
+	// Check whether initialised 
+	public static Boolean isInitialised() { 
+	  return fitsHasBeenInitialised; 
+	}
+
+	
+	// Property 4 verification
+	// A bank account approved by the administrator may not have the same account
+	// number as any other bank account already existing in the system
+
+	public static void fitsAdminApprovingAccount(String new_account_number, BackEnd fits) {
+		for (UserInfo user : fits.getUsers()) {
+			for (BankAccount account : user.getAccounts()) {
+				if (account.isOpen()) {
+					Assertion.check(!account.getAccountNumber().equals(new_account_number), "P4 violated");
+				}
+			}
+		}
+	}
+	
+}
+
+PRELUDE
+
+package rv;
+
+import assertion.Assertion;
+import fits.BankAccount;
+import fits.FrontEnd;
+import fits.UserInfo;
+import fits.BackEnd;
+
+
+RULES
+
+// P1
+before *.makeGoldUser(..) target (UserInfo u) 
+  |  !(u.getCountry().equals("Argentina")) 
+  -> { Assertion.alert("P1 violated"); }
+
+// P2
+after BackEnd.initialise() | -> { Verification.fitsInitialisation(); } 
+before UserInfo.openSession() | !Verification.isInitialised() -> { Assertion.alert("P2 violated"); }
+
+// P3
+after BankAccount.withdraw(..) target (BankAccount a) | a.getBalance() < 0 -> { 
+  Assertion.alert("P3 violated"); }
+after BankAccount.deposit(..) target (BankAccount a) | a.getBalance() < 0 -> { 
+  Assertion.alert("P3 violated"); }
+
+// P4
+before FrontEnd.ADMIN_approveOpenAccount(Integer uid, String accnum) target (FrontEnd fe)
+  | -> { Verification.fitsAdminApprovingAccount(accnum,fe.getBackEnd()); }
+
+// P8 
+// The administrator must reconcile accounts every 1000 attempted external money transfers or an 
+// aggregate total of one million dollars in attempted external transfers.
+before *.USER_payToExternal(Integer uid, Integer sid, String to_account_number, Double amount) | -> { 
+  Verification.fitsExternalMoneyTransferCount ++; 
+  Verification.fitsExternalMoneyTransferAmount += amount; 
+  if (Verification.fitsExternalMoneyTransferCount >= 1000 
+    || Verification.fitsExternalMoneyTransferAmount >= 1000000) {
+     Assertion.alert("P8 violated");
+  }
+}
+
+after *.ADMIN_reconcile(..) | -> { 
+  Verification.fitsExternalMoneyTransferCount = 0; 
+  Verification.fitsExternalMoneyTransferAmount = 0.0; }
+
+
+
+

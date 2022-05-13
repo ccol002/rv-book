@@ -1,0 +1,89 @@
+VERIFICATIONCODE
+
+package rv;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.util.HashMap;
+
+import fits.BackEnd;
+import fits.BankAccount;
+import fits.UserInfo;
+
+public class Verification {
+	static public boolean fitsHasBeenInitialised;
+	static public HashMap<UserInfo,HashMap<Integer, Integer>> accountRequestCount;
+	static public Integer fitsExternalMoneyTransferCount;
+	static public Double fitsExternalMoneyTransferAmount;
+	
+	static public void setupVerification()
+	{
+		fitsHasBeenInitialised = false;
+		accountRequestCount = new HashMap<UserInfo,HashMap<Integer, Integer>>();
+		fitsExternalMoneyTransferCount = 0;
+		fitsExternalMoneyTransferAmount = 0.0;
+		
+		Properties.setupVerification();
+	}
+	
+	// Property 4 verification
+	// A bank account approved by the administrator may not have the same account
+	// number as any other bank account already existing in the system
+
+	public static void fitsAdminApprovingAccount(String new_account_number, BackEnd fits) {
+		for (UserInfo user : fits.getUsers()) {
+			for (BankAccount account : user.getAccounts()) {
+				if (account.isOpen()) {
+					assertTrue(!account.getAccountNumber().equals(new_account_number), "P4 violated");
+				}
+			}
+		}
+	}
+	
+}
+
+PRELUDE
+
+package rv;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.util.HashMap;
+
+import fits.BackEnd;
+import fits.BankAccount;
+import fits.FrontEnd;
+import fits.UserInfo;
+
+RULES
+
+// P1
+before *.makeGoldUser(..) target (UserInfo u) 
+  |  -> { assertTrue(u.getCountry().equals("Argentina"),"P1 violated"); }
+
+// P2
+after BackEnd.initialise(..) | -> { Verification.fitsHasBeenInitialised = true; }
+before UserInfo.openSession(..) | -> { assertTrue(Verification.fitsHasBeenInitialised,"P2 violated"); }
+
+// P3
+after BankAccount.withdraw(..) target (BankAccount a) |  -> { 
+  assertTrue(a.getBalance() >= 0,"P3 violated"); }
+after BankAccount.deposit(..) target (BankAccount a) |  -> { 
+  assertTrue(a.getBalance() >= 0,"P3 violated"); }
+
+// P4
+before FrontEnd.ADMIN_approveOpenAccount(Integer uid, String accnum) target (FrontEnd fe)
+  | -> { Verification.fitsAdminApprovingAccount(accnum,fe.getBackEnd()); }
+
+// P5
+//note that to use the foreach which binds only on the target, 
+//here we switch to the method UserInfo.makeEnabled and makeDisabled
+foreach (UserInfo u) keep (Boolean isEnabled defaultTo false) {
+  before UserInfo.makeDisabled(..) target (UserInfo u) | -> { isEnabled = false; }
+  before UserInfo.makeEnabled(..) target (UserInfo u) | -> { isEnabled = true; }
+  before UserInfo.withdrawFrom(..) target (UserInfo u) |  
+  -> { assertTrue(!isEnabled,"P5 violated"); }
+}
+
+
+
+
+

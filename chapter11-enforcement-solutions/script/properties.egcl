@@ -1,0 +1,132 @@
+VERIFICATIONCODE
+
+
+package rv;
+
+import fits.FrontEnd;
+import timers.Timer;
+import timers.TimerManager;
+
+public class Verification {
+
+	public static Boolean initialised = false;
+	public static Timer reconcile_timer = null;
+	public static FrontEnd frontend = null;
+
+	static public void setupVerification() {
+		TimerManager.reset();
+		initialised = false;
+		reconcile_timer = null;
+		frontend = null;
+
+		Properties.setupVerification();
+	}
+}
+
+
+PRELUDE
+
+package rv;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+
+import fits.*;
+import assertion.*;
+import timers.*;
+
+RULES
+
+// Property 1:
+// Only users based in Argentina can be gold users
+after UserInfo.makeGoldUser() target (UserInfo u)
+  throws RVExceptionProperty1
+  |  !u.getCountry().equals("Argentina")
+  -> {
+    // Log violation
+    Assertion.alert("P1 violated");
+    // Reparation throws exception handled in FrontEnd.ADMIN_makeGoldUser(..)
+    throw new RVExceptionProperty1("P1 violated");
+}
+
+// Property 2
+// The transaction system must be initialised before any user logs in
+after *.initialise(..) | -> { 
+    Verification.initialised = true; 
+  }
+after UserInfo.openSession(..) 
+  throws RVExceptionProperty2
+  |  !Verification.initialised  
+  -> {
+    Assertion.alert("P2 enforced");
+    // Throws exception handled in FrontEnd.USER_login(..)
+    throw new RVExceptionProperty2("P2 violated");
+  }
+
+// Property 3:
+// No account may end up with a negative balance after being accessed
+before BankAccount.withdraw(Double amount) target (BankAccount a)
+  throws RVExceptionProperty3
+  |  a.getBalance() - amount < 0
+  -> {
+    // Log violation
+    Assertion.alert("P3 violated");
+    // Reparation throws exception handled in UserInfo.withdrawFrom(..)
+    throw new RVExceptionProperty3("P3 violated");
+}
+
+// Property 6: 
+// Once greylisted, a user must perform at least three incoming transfers 
+// before being whitelisted.
+
+foreach target (UserInfo u)
+keep (Boolean greylisted defaultTo false, Integer countTransfers defaultTo 0)
+{
+    after UserInfo.makeGreylisted(..) target (UserInfo u) | -> {
+        greylisted = true;
+        countTransfers = 0;
+    }
+    
+    after UserInfo.depositTo(..) target (UserInfo u) | -> {
+        if (greylisted) {
+            countTransfers = countTransfers + 1;
+        }
+    }
+
+    after UserInfo.makeWhitelisted(..) target (UserInfo u)
+      throws RVExceptionProperty6
+      |  ( greylisted && countTransfers < 3 )
+      -> { 
+        // Log violation
+        Assertion.alert("P6 violated");
+
+        // Reparation throws exception handled in FrontEnd.ADMIN_whitelistUser(..)
+        throw new RVExceptionProperty6("P6 violated");
+      }          
+        
+    after UserInfo.makeWhitelisted(..) target (UserInfo u)
+      | -> { greylisted = false; }
+}
+
+// Property 14: 
+// An administrator must reconcile accounts within 5 minutes of initialisation
+after FrontEnd.ADMIN_initialise() target (FrontEnd fe) | -> {
+    Timer timer = new Timer( "TIMEOUT PROPERTY 14", 5*1000l - 500l );
+    Verification.reconcile_timer = timer; 
+    timer.reset();
+    
+    Verification.frontend = fe;
+  }
+
+before FrontEnd.ADMIN_reconcile() | -> {
+    Verification.reconcile_timer.disable(); 
+  }
+
+before Timer.fire(..) target (Timer timer) | -> { 
+    if (timer.getIdentifier().equals("TIMEOUT PROPERTY 14")) { 
+// Reconcile to enforce Property 14
+	System.out.println("** Reconciled to enforce Property 14 **");
+      Verification.frontend.ADMIN_reconcile(); 
+    }
+  }

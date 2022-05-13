@@ -1,0 +1,25 @@
+VERIFICATIONCODE
+
+package transactionsystem;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+
+public class Verification {
+}
+
+PRELUDE
+
+package fits;
+import java.util.HashMap;
+
+RULES
+
+before *.makeGoldUser() target (UserInfo userinfo)
+  |  !userinfo.getCountry().equals("Argentina")
+  -> \{ Assertion.alert("P\ref{prop:goldusers} violated"); \}
+
+before *.setCountry(String country) target (UserInfo userinfo)
+  |  userinfo.isGoldUser() && !country.equals("Argentina")
+  -> \{ Assertion.alert("P\ref{prop:goldusers} violated"); \}
