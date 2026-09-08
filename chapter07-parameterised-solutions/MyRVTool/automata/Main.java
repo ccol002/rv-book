@@ -11,10 +11,8 @@ import egcl.EGCLScript;
 public class Main {
 
 	public static void main(String[] args) {
-		String path = "/Users/chris/Drive Work/Repositories/rv-book-final/rv-book/final-code/dist-final/chapter07-parametrised-solutions/";
-
 		try {
-			AutomataScript script = new AutomataScript(path + "script/properties.aut");
+			AutomataScript script = new AutomataScript("script/properties.aut");
 
 			try {
 
@@ -27,12 +25,12 @@ public class Main {
 
 				EGCLScript eGCLScript = new EGCLScript(filename);
 
-				File file_java = new File(path + "monitoredfits/rv/Verification.java");
+				File file_java = new File("monitoredfits/rv/Verification.java");
 				BufferedWriter output = new BufferedWriter(new FileWriter(file_java));
 				output.write(eGCLScript.getVerificationCode());
 				output.close();
 
-				File file_aj = new File(path + "monitoredfits/rv/Properties.aj");
+				File file_aj = new File("monitoredfits/rv/Properties.aj");
 				output = new BufferedWriter(new FileWriter(file_aj));
 				output.write(eGCLScript.toAspectJ());
 				output.close();

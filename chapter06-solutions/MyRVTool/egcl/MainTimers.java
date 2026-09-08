@@ -8,18 +8,15 @@ import java.io.IOException;
 public class MainTimers {
 	public static void main(String[] args) {
 		try {
-			EGCLScript script = new EGCLScript(
-					"/Users/chris/Drive Work/Repositories/_archive/rv-book/code/Code solutions/08-GCL-Solution-Timers/src/script/properties.rs");
+			EGCLScript script = new EGCLScript("script/properties.egcl");
 			try {
-				File file_java = new File(
-						"/Users/chris/Drive Work/Repositories/_archive/rv-book/code/Code solutions/08-GCL-Solution-Timers/src/transactionsystem/Verification.java");
+				File file_java = new File("monitoredfits/rv/Verification.java");
 
 				BufferedWriter output = new BufferedWriter(new FileWriter(file_java));
 				output.write(script.getVerificationCode());
 				output.close();
 
-				File file_aj = new File(
-						"/Users/chris/Drive Work/Repositories/_archive/rv-book/code/Code solutions/08-GCL-Solution-Timers/src/transactionsystem/Properties.aj");
+				File file_aj = new File("monitoredfits/rv/Properties.aj");
 				output = new BufferedWriter(new FileWriter(file_aj));
 				output.write(script.toAspectJ());
 				output.close();

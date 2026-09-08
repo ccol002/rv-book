@@ -11,24 +11,9 @@ import egcl.EGCLScript;
 public class Main {
 
 	public static void main(String[] args) {
-		String path = "/Users/chris/Drive Work/Repositories/rv-book-final/rv-book/final-code/project-sources/chapter07-solutions/";
-
-		// Gordon
-		// "/Users/gordonpace/Documents/Dropbox/Data/Current Work/>
-		// Papers/InProgress/Book-RV/";
-
-		// Gordon
-		// "Buenos-Aires-Course/";
-
-		// Gordon
-		// "/Code/FiTS/Code/FinancialTransactions-03-GCL-Solution";
-
 		try {
-			AutomataScript script = new AutomataScript(path + "script/properties.aut");
+			AutomataScript script = new AutomataScript("script/properties.aut");
 
-			// "/Users/gordonpace/Documents/Dropbox"
-			// + "/Data/Current Work/> Papers/InProgress/Book-RV/Code"
-			// + "/FiTS/Code/FinancialTransactions-03-GCL-Solution/src/properties.rs");
 			try {
 
 				String filename = "temp.egcl";
@@ -40,12 +25,12 @@ public class Main {
 
 				EGCLScript eGCLScript = new EGCLScript(filename);
 
-				File file_java = new File(path + "src/rv/Verification.java");
+				File file_java = new File("monitoredfits/rv/Verification.java");
 				BufferedWriter output = new BufferedWriter(new FileWriter(file_java));
 				output.write(eGCLScript.getVerificationCode());
 				output.close();
 
-				File file_aj = new File(path + "src/rv/Properties.aj");
+				File file_aj = new File("monitoredfits/rv/Properties.aj");
 				output = new BufferedWriter(new FileWriter(file_aj));
 				output.write(eGCLScript.toAspectJ());
 				output.close();

@@ -29,7 +29,7 @@ public privileged aspect Logger {
 		try {
 			outputWriter = 
 				new BufferedWriter(new FileWriter(new File(
-				"/Users/gordon/Library/Containers/com.softwareambience.Unclutter/Data/Library/Application Support/Unclutter/FileStorage/Research/Writing Now/rv-book/final-code/project-sources/chapter12/log/log.txt"
+				"log/log.txt"
 			)));
 		} catch (IOException e) {
 				e.printStackTrace();

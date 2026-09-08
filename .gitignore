@@ -1,0 +1,16 @@
+# Maven build output
+target/
+
+# Scratch file written by the automata/re/ltl compilers when translating
+# down to EGCL (egcl.Main / automata.Main / re.Main / ltl.Main)
+temp.egcl
+
+# IDE metadata
+.classpath
+.project
+.settings/
+*.iml
+.idea/
+
+# OS cruft
+.DS_Store

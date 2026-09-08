@@ -6,50 +6,193 @@ import ltl.structure.*;
 import fits.*;
 import assertion.Assertion;
 
-public aspect Properties{static void setupVerification(){initialisetriggered2de80c();initialisecurrentLTL2de80c();initialisetriggered44bcfa();initialisecurrentLTL44bcfa();}
 
-static HashMap<UserInfo,Boolean>triggered2de80c=new HashMap<UserInfo,Boolean>();static void initialisetriggered2de80c(){triggered2de80c=new HashMap<UserInfo,Boolean>();}
 
-static HashMap<UserInfo,LTL>currentLTL2de80c=new HashMap<UserInfo,LTL>();static void initialisecurrentLTL2de80c(){currentLTL2de80c=new HashMap<UserInfo,LTL>();}
 
-static HashMap<UserSession,Boolean>triggered44bcfa=new HashMap<UserSession,Boolean>();static void initialisetriggered44bcfa(){triggered44bcfa=new HashMap<UserSession,Boolean>();}
 
-static HashMap<UserSession,LTL>currentLTL44bcfa=new HashMap<UserSession,LTL>();static void initialisecurrentLTL44bcfa(){currentLTL44bcfa=new HashMap<UserSession,LTL>();}
 
-before(UserInfo u):call(*UserInfo.makeEnabled(..))&&target(u)&&!(adviceexecution())&&!cflow(adviceexecution())&&!cflowbelow(adviceexecution()){if(!triggered2de80c.computeIfAbsent(u,(k)->false)){currentLTL2de80c.put(u,currentLTL2de80c.computeIfAbsent(u,(k)->new And(new Until(new Not(new MatchEvent(new Event("before","UserInfo.withdrawFrom"))),new MatchEvent(new Event("before","UserInfo.makeEnabled"))),new Globally(new Implies(new MatchEvent(new Event("before","UserInfo.makeDisabled")),new Next(new Until(new Not(new MatchEvent(new Event("before","UserInfo.withdrawFrom"))),new MatchEvent(new Event("before","UserInfo.makeEnabled")))))))).derivative(new Event("before","UserInfo.makeEnabled")));triggered2de80c.put(u,true);}}
+public aspect Properties {
+static void setupVerification() {
+initialisetriggered29724f();initialisecurrentLTL29724f();
+initialisetriggered9a45b3();initialisecurrentLTL9a45b3();
+}
 
-before(UserInfo u):call(*UserInfo.makeDisabled(..))&&target(u)&&!(adviceexecution())&&!cflow(adviceexecution())&&!cflowbelow(adviceexecution()){if(!triggered2de80c.computeIfAbsent(u,(k)->false)){currentLTL2de80c.put(u,currentLTL2de80c.computeIfAbsent(u,(k)->new And(new Until(new Not(new MatchEvent(new Event("before","UserInfo.withdrawFrom"))),new MatchEvent(new Event("before","UserInfo.makeEnabled"))),new Globally(new Implies(new MatchEvent(new Event("before","UserInfo.makeDisabled")),new Next(new Until(new Not(new MatchEvent(new Event("before","UserInfo.withdrawFrom"))),new MatchEvent(new Event("before","UserInfo.makeEnabled")))))))).derivative(new Event("before","UserInfo.makeDisabled")));triggered2de80c.put(u,true);}}
+static HashMap<UserInfo, Boolean> triggered29724f = new HashMap<UserInfo, Boolean>();
+static void initialisetriggered29724f(){triggered29724f= new HashMap<UserInfo, Boolean>(); }
 
-before(UserInfo u):call(*UserInfo.withdrawFrom(..))&&target(u)&&!(adviceexecution())&&!cflow(adviceexecution())&&!cflowbelow(adviceexecution()){if(!triggered2de80c.computeIfAbsent(u,(k)->false)){currentLTL2de80c.put(u,currentLTL2de80c.computeIfAbsent(u,(k)->new And(new Until(new Not(new MatchEvent(new Event("before","UserInfo.withdrawFrom"))),new MatchEvent(new Event("before","UserInfo.makeEnabled"))),new Globally(new Implies(new MatchEvent(new Event("before","UserInfo.makeDisabled")),new Next(new Until(new Not(new MatchEvent(new Event("before","UserInfo.withdrawFrom"))),new MatchEvent(new Event("before","UserInfo.makeEnabled")))))))).derivative(new Event("before","UserInfo.withdrawFrom")));triggered2de80c.put(u,true);}}
 
-before(UserInfo u):call(*UserInfo.*(..))&&target(u)&&!(adviceexecution())&&!cflow(adviceexecution())&&!cflowbelow(adviceexecution()){if(!triggered2de80c.computeIfAbsent(u,(k)->false)){currentLTL2de80c.put(u,currentLTL2de80c.computeIfAbsent(u,(k)->new And(new Until(new Not(new MatchEvent(new Event("before","UserInfo.withdrawFrom"))),new MatchEvent(new Event("before","UserInfo.makeEnabled"))),new Globally(new Implies(new MatchEvent(new Event("before","UserInfo.makeDisabled")),new Next(new Until(new Not(new MatchEvent(new Event("before","UserInfo.withdrawFrom"))),new MatchEvent(new Event("before","UserInfo.makeEnabled")))))))).derivative(new Event("before","#")));triggered2de80c.put(u,true);}}
+static HashMap<UserInfo, LTL> currentLTL29724f = new HashMap<UserInfo, LTL>();
+static void initialisecurrentLTL29724f(){currentLTL29724f= new HashMap<UserInfo, LTL>(); }
 
-before(UserInfo u):call(*UserInfo.*(..))&&target(u)&&!(adviceexecution())&&!cflow(adviceexecution())&&!cflowbelow(adviceexecution()){if(currentLTL2de80c.computeIfAbsent(u,(k)->new And(new Until(new Not(new MatchEvent(new Event("before","UserInfo.withdrawFrom"))),new MatchEvent(new Event("before","UserInfo.makeEnabled"))),new Globally(new Implies(new MatchEvent(new Event("before","UserInfo.makeDisabled")),new Next(new Until(new Not(new MatchEvent(new Event("before","UserInfo.withdrawFrom"))),new MatchEvent(new Event("before","UserInfo.makeEnabled")))))))).cannotMatch()){Assertion.alert("Violation detected on foreach target (UserInfo u) property { GOOD ((not withdrawFrom until makeEnabled) and Globally ((makeDisabled implies next ((not withdrawFrom until makeEnabled)))))}");}triggered2de80c.put(u,false);}
 
-before(UserSession u):call(*UserSession.openSession(..))&&target(u)&&!(adviceexecution())&&!cflow(adviceexecution())&&!cflowbelow(adviceexecution()){if(!triggered44bcfa.computeIfAbsent(u,(k)->false)){currentLTL44bcfa.put(u,currentLTL44bcfa.computeIfAbsent(u,(k)->new And(new Until(new Not(new MatchEvent(new Event("before","UserSession.log"))),new MatchEvent(new Event("before","UserSession.openSession"))),new Globally(new Implies(new MatchEvent(new Event("before","UserSession.closeSession")),new Next(new Until(new Not(new MatchEvent(new Event("before","UserSession.log"))),new MatchEvent(new Event("before","UserSession.openSession")))))))).derivative(new Event("before","UserSession.openSession")));triggered44bcfa.put(u,true);}}
 
-before(UserSession u):call(*UserSession.log(..))&&target(u)&&!(adviceexecution())&&!cflow(adviceexecution())&&!cflowbelow(adviceexecution()){if(!triggered44bcfa.computeIfAbsent(u,(k)->false)){currentLTL44bcfa.put(u,currentLTL44bcfa.computeIfAbsent(u,(k)->new And(new Until(new Not(new MatchEvent(new Event("before","UserSession.log"))),new MatchEvent(new Event("before","UserSession.openSession"))),new Globally(new Implies(new MatchEvent(new Event("before","UserSession.closeSession")),new Next(new Until(new Not(new MatchEvent(new Event("before","UserSession.log"))),new MatchEvent(new Event("before","UserSession.openSession")))))))).derivative(new Event("before","UserSession.log")));triggered44bcfa.put(u,true);}}
+static HashMap<UserSession, Boolean> triggered9a45b3 = new HashMap<UserSession, Boolean>();
+static void initialisetriggered9a45b3(){triggered9a45b3= new HashMap<UserSession, Boolean>(); }
 
-before(UserSession u):call(*UserSession.closeSession(..))&&target(u)&&!(adviceexecution())&&!cflow(adviceexecution())&&!cflowbelow(adviceexecution()){if(!triggered44bcfa.computeIfAbsent(u,(k)->false)){currentLTL44bcfa.put(u,currentLTL44bcfa.computeIfAbsent(u,(k)->new And(new Until(new Not(new MatchEvent(new Event("before","UserSession.log"))),new MatchEvent(new Event("before","UserSession.openSession"))),new Globally(new Implies(new MatchEvent(new Event("before","UserSession.closeSession")),new Next(new Until(new Not(new MatchEvent(new Event("before","UserSession.log"))),new MatchEvent(new Event("before","UserSession.openSession")))))))).derivative(new Event("before","UserSession.closeSession")));triggered44bcfa.put(u,true);}}
 
-before(UserSession u):call(*UserSession.*(..))&&target(u)&&!(adviceexecution())&&!cflow(adviceexecution())&&!cflowbelow(adviceexecution()){if(!triggered44bcfa.computeIfAbsent(u,(k)->false)){currentLTL44bcfa.put(u,currentLTL44bcfa.computeIfAbsent(u,(k)->new And(new Until(new Not(new MatchEvent(new Event("before","UserSession.log"))),new MatchEvent(new Event("before","UserSession.openSession"))),new Globally(new Implies(new MatchEvent(new Event("before","UserSession.closeSession")),new Next(new Until(new Not(new MatchEvent(new Event("before","UserSession.log"))),new MatchEvent(new Event("before","UserSession.openSession")))))))).derivative(new Event("before","#")));triggered44bcfa.put(u,true);}}
+static HashMap<UserSession, LTL> currentLTL9a45b3 = new HashMap<UserSession, LTL>();
+static void initialisecurrentLTL9a45b3(){currentLTL9a45b3= new HashMap<UserSession, LTL>(); }
 
-before(UserSession u):call(*UserSession.*(..))&&target(u)&&!(adviceexecution())&&!cflow(adviceexecution())&&!cflowbelow(adviceexecution()){if(currentLTL44bcfa.computeIfAbsent(u,(k)->new And(new Until(new Not(new MatchEvent(new Event("before","UserSession.log"))),new MatchEvent(new Event("before","UserSession.openSession"))),new Globally(new Implies(new MatchEvent(new Event("before","UserSession.closeSession")),new Next(new Until(new Not(new MatchEvent(new Event("before","UserSession.log"))),new MatchEvent(new Event("before","UserSession.openSession")))))))).cannotMatch()){Assertion.alert("Violation detected on foreach target (UserSession u) property { GOOD ((not log until openSession) and Globally ((closeSession implies next ((not log until openSession)))))}");}triggered44bcfa.put(u,false);}
 
-before():call(*UserInfo.openSession(..))&&!(adviceexecution())&&!cflow(adviceexecution())&&!cflowbelow(adviceexecution()){if(!Verification.triggerede53b93){Verification.currentLTLe53b93=Verification.currentLTLe53b93.derivative(new Event("before","UserInfo.openSession"));Verification.triggerede53b93=true;}}
 
-before():call(**.*(..))&&!(adviceexecution())&&!cflow(adviceexecution())&&!cflowbelow(adviceexecution()){if(Verification.initialised){if(!Verification.triggerede53b93){Verification.currentLTLe53b93=Verification.currentLTLe53b93.derivative(new Event("before","#"));Verification.triggerede53b93=true;}if(Verification.currentLTLe53b93.cannotMatch()){Assertion.alert("Violation detected on property { GOOD (not openSession until initialise)}");}Verification.triggerede53b93=false;}}
+before (UserInfo u): call(* UserInfo.makeEnabled(..)) &&
+    target(u) &&
+   !(adviceexecution())  &&
+   !cflow(adviceexecution())  &&
+   !cflowbelow(adviceexecution())  {
+    if (!triggered29724f.computeIfAbsent(u, (k) -> false)) {
+currentLTL29724f.put(u,currentLTL29724f.computeIfAbsent(u, (k) -> new And(new Until(new Not(new MatchEvent(new Event("before","UserInfo.withdrawFrom"))),new MatchEvent(new Event("before","UserInfo.makeEnabled"))),new Globally(new Implies(new MatchEvent(new Event("before","UserInfo.makeDisabled")),new Next(new Until(new Not(new MatchEvent(new Event("before","UserInfo.withdrawFrom"))),new MatchEvent(new Event("before","UserInfo.makeEnabled")))))))).derivative(new Event("before","UserInfo.makeEnabled")));triggered29724f.put(u,true);}
+  }
 
-after(UserInfo u):call(*UserInfo.*(..))&&target(u)&&!(adviceexecution())&&!cflow(adviceexecution())&&!cflowbelow(adviceexecution()){if(!triggered2de80c.computeIfAbsent(u,(k)->false)){currentLTL2de80c.put(u,currentLTL2de80c.computeIfAbsent(u,(k)->new And(new Until(new Not(new MatchEvent(new Event("before","UserInfo.withdrawFrom"))),new MatchEvent(new Event("before","UserInfo.makeEnabled"))),new Globally(new Implies(new MatchEvent(new Event("before","UserInfo.makeDisabled")),new Next(new Until(new Not(new MatchEvent(new Event("before","UserInfo.withdrawFrom"))),new MatchEvent(new Event("before","UserInfo.makeEnabled")))))))).derivative(new Event("after","#")));triggered2de80c.put(u,true);}}
 
-after(UserInfo u):call(*UserInfo.*(..))&&target(u)&&!(adviceexecution())&&!cflow(adviceexecution())&&!cflowbelow(adviceexecution()){if(currentLTL2de80c.computeIfAbsent(u,(k)->new And(new Until(new Not(new MatchEvent(new Event("before","UserInfo.withdrawFrom"))),new MatchEvent(new Event("before","UserInfo.makeEnabled"))),new Globally(new Implies(new MatchEvent(new Event("before","UserInfo.makeDisabled")),new Next(new Until(new Not(new MatchEvent(new Event("before","UserInfo.withdrawFrom"))),new MatchEvent(new Event("before","UserInfo.makeEnabled")))))))).cannotMatch()){Assertion.alert("Violation detected on foreach target (UserInfo u) property { GOOD ((not withdrawFrom until makeEnabled) and Globally ((makeDisabled implies next ((not withdrawFrom until makeEnabled)))))}");}triggered2de80c.put(u,false);}
+before (UserInfo u): call(* UserInfo.makeDisabled(..)) &&
+    target(u) &&
+   !(adviceexecution())  &&
+   !cflow(adviceexecution())  &&
+   !cflowbelow(adviceexecution())  {
+    if (!triggered29724f.computeIfAbsent(u, (k) -> false)) {
+currentLTL29724f.put(u,currentLTL29724f.computeIfAbsent(u, (k) -> new And(new Until(new Not(new MatchEvent(new Event("before","UserInfo.withdrawFrom"))),new MatchEvent(new Event("before","UserInfo.makeEnabled"))),new Globally(new Implies(new MatchEvent(new Event("before","UserInfo.makeDisabled")),new Next(new Until(new Not(new MatchEvent(new Event("before","UserInfo.withdrawFrom"))),new MatchEvent(new Event("before","UserInfo.makeEnabled")))))))).derivative(new Event("before","UserInfo.makeDisabled")));triggered29724f.put(u,true);}
+  }
 
-after(UserSession u):call(*UserSession.*(..))&&target(u)&&!(adviceexecution())&&!cflow(adviceexecution())&&!cflowbelow(adviceexecution()){if(!triggered44bcfa.computeIfAbsent(u,(k)->false)){currentLTL44bcfa.put(u,currentLTL44bcfa.computeIfAbsent(u,(k)->new And(new Until(new Not(new MatchEvent(new Event("before","UserSession.log"))),new MatchEvent(new Event("before","UserSession.openSession"))),new Globally(new Implies(new MatchEvent(new Event("before","UserSession.closeSession")),new Next(new Until(new Not(new MatchEvent(new Event("before","UserSession.log"))),new MatchEvent(new Event("before","UserSession.openSession")))))))).derivative(new Event("after","#")));triggered44bcfa.put(u,true);}}
 
-after(UserSession u):call(*UserSession.*(..))&&target(u)&&!(adviceexecution())&&!cflow(adviceexecution())&&!cflowbelow(adviceexecution()){if(currentLTL44bcfa.computeIfAbsent(u,(k)->new And(new Until(new Not(new MatchEvent(new Event("before","UserSession.log"))),new MatchEvent(new Event("before","UserSession.openSession"))),new Globally(new Implies(new MatchEvent(new Event("before","UserSession.closeSession")),new Next(new Until(new Not(new MatchEvent(new Event("before","UserSession.log"))),new MatchEvent(new Event("before","UserSession.openSession")))))))).cannotMatch()){Assertion.alert("Violation detected on foreach target (UserSession u) property { GOOD ((not log until openSession) and Globally ((closeSession implies next ((not log until openSession)))))}");}triggered44bcfa.put(u,false);}
+before (UserInfo u): call(* UserInfo.withdrawFrom(..)) &&
+    target(u) &&
+   !(adviceexecution())  &&
+   !cflow(adviceexecution())  &&
+   !cflowbelow(adviceexecution())  {
+    if (!triggered29724f.computeIfAbsent(u, (k) -> false)) {
+currentLTL29724f.put(u,currentLTL29724f.computeIfAbsent(u, (k) -> new And(new Until(new Not(new MatchEvent(new Event("before","UserInfo.withdrawFrom"))),new MatchEvent(new Event("before","UserInfo.makeEnabled"))),new Globally(new Implies(new MatchEvent(new Event("before","UserInfo.makeDisabled")),new Next(new Until(new Not(new MatchEvent(new Event("before","UserInfo.withdrawFrom"))),new MatchEvent(new Event("before","UserInfo.makeEnabled")))))))).derivative(new Event("before","UserInfo.withdrawFrom")));triggered29724f.put(u,true);}
+  }
 
-after():call(*BackEnd.initialise(..))&&!(adviceexecution())&&!cflow(adviceexecution())&&!cflowbelow(adviceexecution()){if(!Verification.triggerede53b93){Verification.currentLTLe53b93=Verification.currentLTLe53b93.derivative(new Event("after","BackEnd.initialise"));Verification.triggerede53b93=true;}}
 
-after():call(**.*(..))&&!(adviceexecution())&&!cflow(adviceexecution())&&!cflowbelow(adviceexecution()){if(Verification.initialised){if(!Verification.triggerede53b93){Verification.currentLTLe53b93=Verification.currentLTLe53b93.derivative(new Event("after","#"));Verification.triggerede53b93=true;}if(Verification.currentLTLe53b93.cannotMatch()){Assertion.alert("Violation detected on property { GOOD (not openSession until initialise)}");}Verification.triggerede53b93=false;}}
+before (UserInfo u): call(* UserInfo.*(..)) &&
+    target(u) &&
+   !(adviceexecution())  &&
+   !cflow(adviceexecution())  &&
+   !cflowbelow(adviceexecution())  {
+    if (!triggered29724f.computeIfAbsent(u, (k) -> false)) {
+currentLTL29724f.put(u,currentLTL29724f.computeIfAbsent(u, (k) -> new And(new Until(new Not(new MatchEvent(new Event("before","UserInfo.withdrawFrom"))),new MatchEvent(new Event("before","UserInfo.makeEnabled"))),new Globally(new Implies(new MatchEvent(new Event("before","UserInfo.makeDisabled")),new Next(new Until(new Not(new MatchEvent(new Event("before","UserInfo.withdrawFrom"))),new MatchEvent(new Event("before","UserInfo.makeEnabled")))))))).derivative(new Event("before", "#")));triggered29724f.put(u,true);}
+  }
+
+
+after (UserInfo u): call(* UserInfo.*(..)) &&
+    target(u) &&
+   !(adviceexecution())  &&
+   !cflow(adviceexecution())  &&
+   !cflowbelow(adviceexecution())  {
+    if (!triggered29724f.computeIfAbsent(u, (k) -> false)) {
+currentLTL29724f.put(u,currentLTL29724f.computeIfAbsent(u, (k) -> new And(new Until(new Not(new MatchEvent(new Event("before","UserInfo.withdrawFrom"))),new MatchEvent(new Event("before","UserInfo.makeEnabled"))),new Globally(new Implies(new MatchEvent(new Event("before","UserInfo.makeDisabled")),new Next(new Until(new Not(new MatchEvent(new Event("before","UserInfo.withdrawFrom"))),new MatchEvent(new Event("before","UserInfo.makeEnabled")))))))).derivative(new Event("after", "#")));triggered29724f.put(u,true);}
+  }
+
+
+before (UserInfo u): call(* UserInfo.*(..)) &&
+    target(u) &&
+   !(adviceexecution())  &&
+   !cflow(adviceexecution())  &&
+   !cflowbelow(adviceexecution())  {
+if (currentLTL29724f.computeIfAbsent(u, (k) -> new And(new Until(new Not(new MatchEvent(new Event("before","UserInfo.withdrawFrom"))),new MatchEvent(new Event("before","UserInfo.makeEnabled"))),new Globally(new Implies(new MatchEvent(new Event("before","UserInfo.makeDisabled")),new Next(new Until(new Not(new MatchEvent(new Event("before","UserInfo.withdrawFrom"))),new MatchEvent(new Event("before","UserInfo.makeEnabled")))))))).cannotMatch()) { Assertion.alert("Violation detected on foreach target (UserInfo u) property { GOOD ((not [before UserInfo.withdrawFrom] until [before UserInfo.makeEnabled]) and Globally (([before UserInfo.makeDisabled] implies next ((not [before UserInfo.withdrawFrom] until [before UserInfo.makeEnabled])))))}"); }triggered29724f.put(u,false);}
+
+
+after (UserInfo u): call(* UserInfo.*(..)) &&
+    target(u) &&
+   !(adviceexecution())  &&
+   !cflow(adviceexecution())  &&
+   !cflowbelow(adviceexecution())  {
+if (currentLTL29724f.computeIfAbsent(u, (k) -> new And(new Until(new Not(new MatchEvent(new Event("before","UserInfo.withdrawFrom"))),new MatchEvent(new Event("before","UserInfo.makeEnabled"))),new Globally(new Implies(new MatchEvent(new Event("before","UserInfo.makeDisabled")),new Next(new Until(new Not(new MatchEvent(new Event("before","UserInfo.withdrawFrom"))),new MatchEvent(new Event("before","UserInfo.makeEnabled")))))))).cannotMatch()) { Assertion.alert("Violation detected on foreach target (UserInfo u) property { GOOD ((not [before UserInfo.withdrawFrom] until [before UserInfo.makeEnabled]) and Globally (([before UserInfo.makeDisabled] implies next ((not [before UserInfo.withdrawFrom] until [before UserInfo.makeEnabled])))))}"); }triggered29724f.put(u,false);}
+
+
+before (UserSession u): call(* UserSession.openSession(..)) &&
+    target(u) &&
+   !(adviceexecution())  &&
+   !cflow(adviceexecution())  &&
+   !cflowbelow(adviceexecution())  {
+    if (!triggered9a45b3.computeIfAbsent(u, (k) -> false)) {
+currentLTL9a45b3.put(u,currentLTL9a45b3.computeIfAbsent(u, (k) -> new And(new Until(new Not(new MatchEvent(new Event("before","UserSession.log"))),new MatchEvent(new Event("before","UserSession.openSession"))),new Globally(new Implies(new MatchEvent(new Event("before","UserSession.closeSession")),new Next(new Until(new Not(new MatchEvent(new Event("before","UserSession.log"))),new MatchEvent(new Event("before","UserSession.openSession")))))))).derivative(new Event("before","UserSession.openSession")));triggered9a45b3.put(u,true);}
+  }
+
+
+before (UserSession u): call(* UserSession.log(..)) &&
+    target(u) &&
+   !(adviceexecution())  &&
+   !cflow(adviceexecution())  &&
+   !cflowbelow(adviceexecution())  {
+    if (!triggered9a45b3.computeIfAbsent(u, (k) -> false)) {
+currentLTL9a45b3.put(u,currentLTL9a45b3.computeIfAbsent(u, (k) -> new And(new Until(new Not(new MatchEvent(new Event("before","UserSession.log"))),new MatchEvent(new Event("before","UserSession.openSession"))),new Globally(new Implies(new MatchEvent(new Event("before","UserSession.closeSession")),new Next(new Until(new Not(new MatchEvent(new Event("before","UserSession.log"))),new MatchEvent(new Event("before","UserSession.openSession")))))))).derivative(new Event("before","UserSession.log")));triggered9a45b3.put(u,true);}
+  }
+
+
+before (UserSession u): call(* UserSession.closeSession(..)) &&
+    target(u) &&
+   !(adviceexecution())  &&
+   !cflow(adviceexecution())  &&
+   !cflowbelow(adviceexecution())  {
+    if (!triggered9a45b3.computeIfAbsent(u, (k) -> false)) {
+currentLTL9a45b3.put(u,currentLTL9a45b3.computeIfAbsent(u, (k) -> new And(new Until(new Not(new MatchEvent(new Event("before","UserSession.log"))),new MatchEvent(new Event("before","UserSession.openSession"))),new Globally(new Implies(new MatchEvent(new Event("before","UserSession.closeSession")),new Next(new Until(new Not(new MatchEvent(new Event("before","UserSession.log"))),new MatchEvent(new Event("before","UserSession.openSession")))))))).derivative(new Event("before","UserSession.closeSession")));triggered9a45b3.put(u,true);}
+  }
+
+
+before (UserSession u): call(* UserSession.*(..)) &&
+    target(u) &&
+   !(adviceexecution())  &&
+   !cflow(adviceexecution())  &&
+   !cflowbelow(adviceexecution())  {
+    if (!triggered9a45b3.computeIfAbsent(u, (k) -> false)) {
+currentLTL9a45b3.put(u,currentLTL9a45b3.computeIfAbsent(u, (k) -> new And(new Until(new Not(new MatchEvent(new Event("before","UserSession.log"))),new MatchEvent(new Event("before","UserSession.openSession"))),new Globally(new Implies(new MatchEvent(new Event("before","UserSession.closeSession")),new Next(new Until(new Not(new MatchEvent(new Event("before","UserSession.log"))),new MatchEvent(new Event("before","UserSession.openSession")))))))).derivative(new Event("before", "#")));triggered9a45b3.put(u,true);}
+  }
+
+
+after (UserSession u): call(* UserSession.*(..)) &&
+    target(u) &&
+   !(adviceexecution())  &&
+   !cflow(adviceexecution())  &&
+   !cflowbelow(adviceexecution())  {
+    if (!triggered9a45b3.computeIfAbsent(u, (k) -> false)) {
+currentLTL9a45b3.put(u,currentLTL9a45b3.computeIfAbsent(u, (k) -> new And(new Until(new Not(new MatchEvent(new Event("before","UserSession.log"))),new MatchEvent(new Event("before","UserSession.openSession"))),new Globally(new Implies(new MatchEvent(new Event("before","UserSession.closeSession")),new Next(new Until(new Not(new MatchEvent(new Event("before","UserSession.log"))),new MatchEvent(new Event("before","UserSession.openSession")))))))).derivative(new Event("after", "#")));triggered9a45b3.put(u,true);}
+  }
+
+
+before (UserSession u): call(* UserSession.*(..)) &&
+    target(u) &&
+   !(adviceexecution())  &&
+   !cflow(adviceexecution())  &&
+   !cflowbelow(adviceexecution())  {
+if (currentLTL9a45b3.computeIfAbsent(u, (k) -> new And(new Until(new Not(new MatchEvent(new Event("before","UserSession.log"))),new MatchEvent(new Event("before","UserSession.openSession"))),new Globally(new Implies(new MatchEvent(new Event("before","UserSession.closeSession")),new Next(new Until(new Not(new MatchEvent(new Event("before","UserSession.log"))),new MatchEvent(new Event("before","UserSession.openSession")))))))).cannotMatch()) { Assertion.alert("Violation detected on foreach target (UserSession u) property { GOOD ((not [before UserSession.log] until [before UserSession.openSession]) and Globally (([before UserSession.closeSession] implies next ((not [before UserSession.log] until [before UserSession.openSession])))))}"); }triggered9a45b3.put(u,false);}
+
+
+after (UserSession u): call(* UserSession.*(..)) &&
+    target(u) &&
+   !(adviceexecution())  &&
+   !cflow(adviceexecution())  &&
+   !cflowbelow(adviceexecution())  {
+if (currentLTL9a45b3.computeIfAbsent(u, (k) -> new And(new Until(new Not(new MatchEvent(new Event("before","UserSession.log"))),new MatchEvent(new Event("before","UserSession.openSession"))),new Globally(new Implies(new MatchEvent(new Event("before","UserSession.closeSession")),new Next(new Until(new Not(new MatchEvent(new Event("before","UserSession.log"))),new MatchEvent(new Event("before","UserSession.openSession")))))))).cannotMatch()) { Assertion.alert("Violation detected on foreach target (UserSession u) property { GOOD ((not [before UserSession.log] until [before UserSession.openSession]) and Globally (([before UserSession.closeSession] implies next ((not [before UserSession.log] until [before UserSession.openSession])))))}"); }triggered9a45b3.put(u,false);}
+
+
+before (): call(* UserInfo.openSession(..)) &&
+   !(adviceexecution())  &&
+   !cflow(adviceexecution())  &&
+   !cflowbelow(adviceexecution())  {
+    if (!Verification.triggereda418fc) { Verification.currentLTLa418fc = Verification.currentLTLa418fc.derivative(new Event("before","UserInfo.openSession")); Verification.triggereda418fc = true;}
+  }
+
+after (): call(* BackEnd.initialise(..)) &&
+   !(adviceexecution())  &&
+   !cflow(adviceexecution())  &&
+   !cflowbelow(adviceexecution())  {
+    if (!Verification.triggereda418fc) { Verification.currentLTLa418fc = Verification.currentLTLa418fc.derivative(new Event("after","BackEnd.initialise")); Verification.triggereda418fc = true;}
+  }
+
+before (): call(* *.*(..)) &&
+   !(adviceexecution())  &&
+   !cflow(adviceexecution())  &&
+   !cflowbelow(adviceexecution())  {
+    if (Verification.initialised) { if (!Verification.triggereda418fc) {Verification.currentLTLa418fc = Verification.currentLTLa418fc.derivative(new Event("before", "#")); Verification.triggereda418fc = true; } if (Verification.currentLTLa418fc.cannotMatch()) { Assertion.alert("Violation detected on property { GOOD (not [before UserInfo.openSession] until [after BackEnd.initialise])}"); } Verification.triggereda418fc = false; }
+  }
+
+after (): call(* *.*(..)) &&
+   !(adviceexecution())  &&
+   !cflow(adviceexecution())  &&
+   !cflowbelow(adviceexecution())  {
+    if (Verification.initialised) { if (!Verification.triggereda418fc) {Verification.currentLTLa418fc = Verification.currentLTLa418fc.derivative(new Event("after", "#")); Verification.triggereda418fc = true; } if (Verification.currentLTLa418fc.cannotMatch()) { Assertion.alert("Violation detected on property { GOOD (not [before UserInfo.openSession] until [after BackEnd.initialise])}"); } Verification.triggereda418fc = false; }
+  }
 
 }
