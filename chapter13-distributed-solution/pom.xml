@@ -3,15 +3,19 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>mt.edu.um.rvbook</groupId>
-    <artifactId>rv-book</artifactId>
-    <version>1.0.0</version>
-    <relativePath>../pom.xml</relativePath>
-  </parent>
-
+  <!-- This chapter is a standalone Maven project: it does not depend on,
+       or get built alongside, any other chapter. "cd chapter13-distributed-solution && mvn compile"
+       (or "mvn -f chapter13-distributed-solution/pom.xml compile") only ever touches this folder. -->
+  <groupId>mt.edu.um.rvbook</groupId>
   <artifactId>chapter13-distributed-solution</artifactId>
+  <version>1.0.0</version>
   <packaging>jar</packaging>
+
+  <properties>
+    <maven.compiler.source>17</maven.compiler.source>
+    <maven.compiler.target>17</maven.compiler.target>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
 
   <build>
     <sourceDirectory>${project.basedir}</sourceDirectory>

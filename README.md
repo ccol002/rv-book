@@ -18,27 +18,28 @@ verification in action.
 
 ## Building with Maven
 
-Every chapter folder is its own Maven module, so you no longer need to
-hand-configure a classpath or hunt down the AspectJ jars yourself:
+Every chapter folder is its own **standalone** Maven project — there is no
+shared parent POM and no multi-module build tying chapters together, so one
+chapter's state can never affect another's:
 
 ```sh
-# build everything
+cd chapter06-solutions
 mvn compile
-
-# build just one chapter
-mvn -pl chapter06-solutions compile
 ```
+
+(There's deliberately no `pom.xml` at the repository root — `mvn compile`
+from here just errors, telling you to `cd` into a chapter first, rather
+than silently trying to build all 47 at once.)
 
 **A chapter you haven't finished yet is *expected* to fail to build** —
 e.g. `chapter06`, where `Properties.aj` is intentionally an incomplete
 stub, or `chapter08`/`chapter09`, where the automaton/LTL translation still
-has unimplemented methods. That's the exercise: the compiler errors point
-you at exactly what's still missing, and the corresponding `-solutions`
-module builds cleanly once you're stuck. `.mvn/maven.config` sets
-`--fail-at-end` for the whole repo, so `mvn compile` from the root still
-builds every chapter it can and gives you one failure/success summary at
-the end, rather than stopping dead at the first chapter you haven't
-finished (which, without it, is Maven's default multi-module behaviour).
+has unimplemented methods, or `chapter13-persistence`, which doesn't ship
+a `Verification` class yet. That's the exercise itself: the compiler
+errors point you at exactly what's still missing, and the corresponding
+`-solutions` folder builds cleanly for comparison. That failure is entirely
+local to that one chapter's own `mvn compile` — it has no way to affect
+any other chapter, since each is built completely independently.
 
 Chapters that weave an AspectJ aspect (`monitoredfits/rv/Properties.aj` or
 similar) use the [aspectj-maven-plugin](https://github.com/eclipse-aspectj/aspectj-maven-plugin)

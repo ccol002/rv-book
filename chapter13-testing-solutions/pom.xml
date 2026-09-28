@@ -3,15 +3,20 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>mt.edu.um.rvbook</groupId>
-    <artifactId>rv-book</artifactId>
-    <version>1.0.0</version>
-    <relativePath>../pom.xml</relativePath>
-  </parent>
-
+  <!-- This chapter is a standalone Maven project: it does not depend on,
+       or get built alongside, any other chapter. "cd chapter13-testing-solutions && mvn compile"
+       (or "mvn -f chapter13-testing-solutions/pom.xml compile") only ever touches this folder. -->
+  <groupId>mt.edu.um.rvbook</groupId>
   <artifactId>chapter13-testing-solutions</artifactId>
+  <version>1.0.0</version>
   <packaging>jar</packaging>
+
+  <properties>
+    <maven.compiler.source>17</maven.compiler.source>
+    <maven.compiler.target>17</maven.compiler.target>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <aspectj.version>1.9.22.1</aspectj.version>
+  </properties>
 
   <dependencies>
     <dependency>
@@ -22,17 +27,17 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>${junit4.version}</version>
+      <version>4.13.2</version>
     </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-api</artifactId>
-      <version>${junit-jupiter.version}</version>
+      <version>5.10.3</version>
     </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-engine</artifactId>
-      <version>${junit-jupiter.version}</version>
+      <version>5.10.3</version>
     </dependency>
   </dependencies>
 
@@ -56,7 +61,7 @@
       <plugin>
         <groupId>dev.aspectj</groupId>
         <artifactId>aspectj-maven-plugin</artifactId>
-        <version>${aspectj-maven-plugin.version}</version>
+        <version>1.14</version>
         <configuration>
           <complianceLevel>${maven.compiler.target}</complianceLevel>
           <source>${maven.compiler.source}</source>
