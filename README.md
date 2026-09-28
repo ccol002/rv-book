@@ -29,6 +29,17 @@ mvn compile
 mvn -pl chapter06-solutions compile
 ```
 
+**A chapter you haven't finished yet is *expected* to fail to build** —
+e.g. `chapter06`, where `Properties.aj` is intentionally an incomplete
+stub, or `chapter08`/`chapter09`, where the automaton/LTL translation still
+has unimplemented methods. That's the exercise: the compiler errors point
+you at exactly what's still missing, and the corresponding `-solutions`
+module builds cleanly once you're stuck. `.mvn/maven.config` sets
+`--fail-at-end` for the whole repo, so `mvn compile` from the root still
+builds every chapter it can and gives you one failure/success summary at
+the end, rather than stopping dead at the first chapter you haven't
+finished (which, without it, is Maven's default multi-module behaviour).
+
 Chapters that weave an AspectJ aspect (`monitoredfits/rv/Properties.aj` or
 similar) use the [aspectj-maven-plugin](https://github.com/eclipse-aspectj/aspectj-maven-plugin)
 to compile and weave in one step; plain chapters just use the standard Java
@@ -38,13 +49,6 @@ directly, e.g.:
 ```sh
 java -cp chapter06-solutions/target/classes:$(find ~/.m2 -name 'aspectjrt-*.jar' | head -1) fits.Main
 ```
-
-**Note for exercise chapters:** in a chapter you haven't finished yet (e.g.
-`chapter06`, where `Properties.aj` is intentionally an incomplete stub, or
-`chapter08`/`chapter09`, where the automaton/LTL translation still has
-unimplemented methods), `mvn compile` for that module is *expected* to fail
-until you've done the exercise — the compiler errors point you at exactly
-what's still missing. The corresponding `-solutions` module builds cleanly.
 
 An IDE with AspectJ support (e.g. Eclipse + AJDT) still works exactly as
 before if you prefer that workflow — Maven is an addition, not a replacement.
