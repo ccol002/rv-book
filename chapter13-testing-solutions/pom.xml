@@ -83,6 +83,13 @@
           </dependency>
         </dependencies>
       </plugin>
+      <plugin>
+        <!-- Lets you run any class without juggling a -cp by hand:
+             mvn exec:java -Dexec.mainClass="fits.Main" -->
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>3.3.0</version>
+      </plugin>
     </plugins>
   </build>
 </project>

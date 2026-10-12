@@ -45,11 +45,19 @@ Chapters that weave an AspectJ aspect (`monitoredfits/rv/Properties.aj` or
 similar) use the [aspectj-maven-plugin](https://github.com/eclipse-aspectj/aspectj-maven-plugin)
 to compile and weave in one step; plain chapters just use the standard Java
 compiler. After building, run the class named in that chapter's `readme.txt`
-directly, e.g.:
+with `exec-maven-plugin`, e.g. from inside `chapter06-solutions`:
 
 ```sh
-java -cp chapter06-solutions/target/classes:$(find ~/.m2 -name 'aspectjrt-*.jar' | head -1) fits.Main
+mvn exec:java -Dexec.mainClass="fits.Main"
 ```
+
+That picks up the project's full classpath (woven classes, AspectJ runtime,
+anything else the chapter depends on) automatically, so there's no need to
+locate jars or build a `-cp` by hand; `mvn compile exec:java -Dexec.mainClass=...`
+does both steps in one command, run from the right JDK (whichever one `mvn`
+itself uses — check with `mvn -version` if you ever need to run the
+resulting classes some other way, e.g. plain `java`, and it picks a
+different, older JDK than Maven did).
 
 An IDE with AspectJ support (e.g. Eclipse + AJDT) still works exactly as
 before if you prefer that workflow — Maven is an addition, not a replacement.
